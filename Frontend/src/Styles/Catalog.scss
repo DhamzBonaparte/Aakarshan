@@ -1,0 +1,630 @@
+// ============================================
+// VARIABLES
+// ============================================
+$primary-color: #1a1a1a;
+$border-color: #e5e5e5;
+$text-primary: #1a1a1a;
+$text-secondary: #666666;
+$text-muted: #999999;
+$background: #ffffff;
+$accent-bg: #f5f5f5;
+$tag-bg: #1a1a1a;
+$tag-text: #ffffff;
+$spacing-unit: 8px;
+$border-radius: 8px;
+$transition-speed: 0.3s;
+$shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+// ============================================
+// MIXINS
+// ============================================
+@mixin container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ============================================
+// BASE STYLES
+// ============================================
+.browse-designs {
+  min-height: 100vh;
+//   padding-top: 80px;
+  padding-bottom: 80px; // Space for cart summary
+  background-color: $background;
+
+  &__container {
+    @include container;
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+
+  &__header {
+    margin-bottom: 32px;
+  }
+
+  &__title {
+    font-size: 36px;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+
+  &__subtitle {
+    font-size: 16px;
+    color: $text-secondary;
+  }
+
+  &__content {
+    display: flex;
+    gap: 32px;
+  }
+
+  &__sidebar {
+    width: 256px;
+    flex-shrink: 0;
+    transition: all $transition-speed ease;
+    overflow: hidden;
+
+    &:not(.is-visible) {
+      width: 0;
+      opacity: 0;
+    }
+  }
+
+  &__main {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+// ============================================
+// CART NOTIFICATION
+// ============================================
+.cart-notification {
+  position: fixed;
+  top: 100px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  background-color: $primary-color;
+  color: $tag-text;
+  border-radius: $border-radius;
+  box-shadow: $shadow-md;
+  z-index: 1000;
+  font-size: 14px;
+  font-weight: 500;
+
+  &__icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  @media (max-width: 768px) {
+    top: 80px;
+    right: 16px;
+    left: 16px;
+  }
+}
+
+// ============================================
+// CART SUMMARY
+// ============================================
+.cart-summary {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: $background;
+  border-top: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+  z-index: 999;
+  padding: 16px 24px;
+
+  &__content {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__icon {
+    width: 24px;
+    height: 24px;
+    color: $primary-color;
+  }
+
+  &__count {
+    font-size: 16px;
+    font-weight: 500;
+    color: $text-primary;
+  }
+
+  &__total {
+    font-size: 18px;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  &__checkout {
+    padding: 12px 32px;
+    background-color: $primary-color;
+    color: $tag-text;
+    border: none;
+    border-radius: $border-radius;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #333;
+    }
+  }
+
+  @media (max-width: 640px) {
+    &__content {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    &__checkout {
+      width: 100%;
+    }
+  }
+}
+
+// ============================================
+// FILTERS SIDEBAR
+// ============================================
+.filters {
+  position: sticky;
+  top: 104px;
+
+  &__header {
+    @include flex-between;
+    margin-bottom: 24px;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    color: $text-primary;
+  }
+
+  &__icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  &__clear {
+    font-size: 14px;
+    color: $text-secondary;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $text-primary;
+    }
+  }
+
+  &__section {
+    margin-bottom: 32px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__section-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: $text-primary;
+    margin-bottom: 16px;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: $text-secondary;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $text-primary;
+    }
+  }
+
+  &__checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid $border-color;
+    border-radius: 4px;
+    cursor: pointer;
+    accent-color: $primary-color;
+  }
+
+  &__label {
+    user-select: none;
+  }
+}
+
+// ============================================
+// CONTROLS
+// ============================================
+.controls {
+  @include flex-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 32px;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__sort-label {
+    font-size: 14px;
+    color: $text-secondary;
+  }
+
+  &__sort-select {
+    padding: 8px 32px 8px 16px;
+    background-color: $background;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    font-size: 14px;
+    color: $text-primary;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231a1a1a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
+  }
+
+  &__filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: none;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    font-size: 14px;
+    color: $text-primary;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      background-color: $accent-bg;
+    }
+  }
+
+  &__count {
+    font-size: 14px;
+    color: $text-secondary;
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: stretch;
+
+    &__left,
+    &__right {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+}
+
+// ============================================
+// ACTIVE FILTERS
+// ============================================
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+
+  &__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background-color: $tag-bg;
+    color: $tag-text;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 400;
+  }
+
+  &__remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 0.2s;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover {
+      color: $tag-text;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+// ============================================
+// DESIGNS GRID
+// ============================================
+.designs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================================
+// DESIGN CARD
+// ============================================
+.design-card {
+  background: $background;
+  border-radius: $border-radius;
+  overflow: hidden;
+  transition: all $transition-speed ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid $border-color;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    border-color: transparent;
+  }
+
+  &__image-container {
+    position: relative;
+    width: 100%;
+    background-color: $accent-bg;
+    overflow: hidden;
+    border-radius: $border-radius $border-radius 0 0;
+    
+    &.portrait {
+      aspect-ratio: 3 / 4;
+    }
+    
+    &.landscape {
+      aspect-ratio: 4 / 3;
+    }
+    
+    &.square {
+      aspect-ratio: 1 / 1;
+    }
+  }
+
+  &__badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 6px 12px;
+    background-color: #ff6b6b;
+    color: $tag-text;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 2;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    display: block;
+  }
+
+  .design-card:hover &__image {
+    transform: scale(1.05);
+  }
+
+  &__content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 500;
+    color: $text-primary;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  &__price {
+    font-size: 20px;
+    font-weight: 600;
+    color: $primary-color;
+    white-space: nowrap;
+  }
+
+  &__description {
+    font-size: 14px;
+    color: $text-secondary;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  &__sizes {
+    font-size: 13px;
+    color: $text-muted;
+    margin-bottom: 16px;
+  }
+
+  &__add-to-cart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    margin-top: auto;
+    background-color: $primary-color;
+    color: $tag-text;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #333;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  &__cart-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// ============================================
+// NO RESULTS
+// ============================================
+.no-results {
+  text-align: center;
+  padding: 64px 0;
+
+  &__text {
+    color: $text-secondary;
+    margin-bottom: 16px;
+  }
+
+  &__btn {
+    padding: 10px 24px;
+    background-color: $tag-bg;
+    color: $tag-text;
+    border: none;
+    border-radius: $border-radius;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@media (max-width: 768px) {
+  .browse-designs {
+    &__content {
+      flex-direction: column;
+    }
+
+    &__sidebar {
+      width: 100%;
+
+      &:not(.is-visible) {
+        display: none;
+      }
+    }
+  }
+
+  .filters {
+    position: static;
+  }
+
+  .designs-grid {
+    gap: 24px;
+  }
+}

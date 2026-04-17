@@ -1,0 +1,52 @@
+.about-section {
+    padding: 80px 24px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 2 16px 12px rgba(0, 0, 0, 0.25);
+    border-bottom: #dedcdc 1px solid;
+
+
+    .about-content {
+        max-width: 850px; // Limits text width to match the screenshot look
+        margin: 0 auto;
+
+        h2 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            color: #000;
+        }
+
+        .about-description {
+            color: #636e72;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+    }
+
+    .feature-pills {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+
+        .pill {
+            background-color: #f1f2f6; // Light gray background from image
+            padding: 10px 20px;
+            border-radius: 12px;
+            color: #636e72;
+            font-size: 0.95rem;
+            font-weight: 500;
+            white-space: nowrap;
+
+            span {
+                color: #000; // Darker text for the specific highlights
+                font-weight: 600;
+            }
+        }
+    }
+}

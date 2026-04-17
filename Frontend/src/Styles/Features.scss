@@ -1,0 +1,64 @@
+.features-section {
+  padding: 100px 24px;
+    background: #d5d5d5d7;             // base white background
+//   background-color: #ffffff;
+  
+  .features-wrapper {
+    max-width: 95%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    .features-grid{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+  }
+
+  .feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  // The black icon container
+  .icon-box {
+    width: 80px;
+    height: 80px;
+    background-color: #050509; // Rich black
+    border-radius: 24px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    color: #ffffff;
+    
+    svg {
+      font-size: 32px;
+    }
+
+    &:hover {
+      transform: scale(1.05);
+      transition: transform 0.2s ease-in-out;
+    }
+  }
+
+  .feature-title {
+    font-weight: 700 !important;
+    font-size: 1.25rem !important;
+    color: #000000;
+    margin-bottom: 12px !important;
+    letter-spacing: -0.01em;
+  }
+
+  .feature-description {
+    font-size: 1rem !important;
+    color: #636e72; // The muted gray from your screenshot
+    line-height: 1.6 !important;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+}

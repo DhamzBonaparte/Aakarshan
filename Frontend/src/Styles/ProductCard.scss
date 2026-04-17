@@ -1,0 +1,109 @@
+.product-section {
+    padding: 80px 0;
+    width: 100%;
+    overflow: hidden; // Prevents any rogue child from causing horizontal scroll
+
+    .section-header {
+        margin-bottom: 40px;
+        h2 {
+            font-weight: 700;
+            font-size: 1.75rem;
+            color: #1a1a1a;
+        }
+        p {
+            color: #636e72;
+            max-width: 600px;
+        }
+    }
+
+    .products-grid{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+}
+
+.product-card {
+    border: #d2d2d3 1px solid ;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;        // Force it to match Grid column width
+    height: 100%;       // Stretch to fill row height
+    background: #fff;
+    box-sizing: border-box;
+
+    .image-container {
+        width: 100%;
+        position: relative;
+        aspect-ratio: 4 / 5; // Forces the shape
+        overflow: hidden;    // Crops images that are too big
+        border-radius: 4px;
+        margin-bottom: 16px;
+
+        img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; // Fills the container without distortion
+            display: block;
+        }
+    }
+
+    .product-info {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1; // Makes the info box fill the rest of the card
+
+        .product-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 4px !important;
+            line-height: 1.2;
+        }
+
+        .product-desc {
+            color: #636e72;
+            font-size: 0.9rem;
+            margin-bottom: 8px !important;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; // Limits text to 2 lines so cards stay even
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-sizes {
+            color: #b2bec3;
+            font-size: 0.8rem;
+            margin-bottom: 16px !important;
+        }
+
+        .card-footer {
+            margin-top: auto; // Pushes the price/button to the bottom
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+
+            .price {
+                font-weight: 700;
+                font-size: 1.1rem;
+            }
+
+            .add-btn {
+                background-color: #050509 !important;
+                color: #fff !important;
+                border-radius: 8px !important;
+                text-transform: none !important;
+                box-shadow: none !important;
+                
+                &:hover {
+                    background-color: #2d3436 !important;
+                }
+            }
+        }
+    }
+}

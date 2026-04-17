@@ -1,0 +1,92 @@
+.footer-section {
+    padding: 100px 0 60px; // Increased vertical padding for more breathing room
+    background-color: #fafafa;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    border-top: #dbdbdb 1px solid;
+
+    .footer-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+    }
+
+    .footer-column {
+        .footer-logo {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #000;
+            margin-bottom: 28px !important;
+            letter-spacing: -0.01em;
+        }
+
+        .footer-tagline {
+            color: #636e72;
+            font-size: 1rem;
+            line-height: 1.6;
+            max-width: 250px; // Slightly wider for better flow
+        }
+
+        .column-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #000;
+            margin-bottom: 28px !important;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            li {
+                margin-bottom: 16px; // More space between list items
+
+                a {
+                    text-decoration: none;
+                    color: #636e72;
+                    font-size: 0.95rem;
+                    transition: color 0.3s ease;
+
+                    &:hover {
+                        color: #000;
+                    }
+                }
+            }
+        }
+    }
+
+    .footer-divider {
+        height: 1px;
+        background-color: #cacacc;
+        margin: 80px 0 40px; // Pushes the divider further down
+        width: 70%;
+    }
+
+    .footer-bottom {
+        text-align: center;
+
+        p {
+            color: #636e72;
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+    }
+}
+
+// Ensure mobile still looks clean
+@media (max-width: 900px) {
+    .footer-section {
+        padding: 60px 24px;
+
+        .footer-column {
+            margin-bottom: 40px;
+        }
+
+        .footer-divider {
+            margin: 40px 0 20px;
+        }
+    }
+}

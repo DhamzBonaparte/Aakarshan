@@ -1,0 +1,136 @@
+.order-section {
+  padding: 60px 16px; // Reduced padding for mobile
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .order-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (min-width: 600px) {
+    padding: 40px 24px;
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 32px;
+    max-width: 600px;
+
+    h2 {
+      font-weight: 700;
+      font-size: 1.5rem; // Slightly smaller for mobile
+      margin-bottom: 12px;
+
+      @media (min-width: 600px) {
+        font-size: 1.75rem;
+      }
+    }
+
+    p {
+      color: #636e72;
+      line-height: 1.6;
+      font-size: 0.9rem;
+
+      @media (min-width: 600px) {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .form-card {
+    background-color: #fff;
+    padding: 24px; // Mobile padding
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 900px;
+
+    @media (min-width: 600px) {
+      padding: 40px; // Desktop padding
+    }
+
+    .order-form-grid{
+        display: flex;
+        justify-content: start;
+        align-items: center;
+    }
+
+    .input-label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .MuiOutlinedInput-root {
+      background-color: #f1f2f6;
+      border-radius: 8px;
+      
+      fieldset {
+        border: none;
+      }
+
+      &.Mui-focused {
+        background-color: #fff;
+        box-shadow: 0 0 0 2px #000;
+      }
+    }
+
+    .upload-box {
+      border: 2px dashed #dcdde1;
+      border-radius: 12px;
+      padding: 30px 16px; // Adjusted for mobile
+      text-align: center;
+      cursor: pointer;
+      background-color: #f8f9fa;
+      transition: all 0.2s ease;
+      margin-top: 8px;
+
+      @media (min-width: 600px) {
+        padding: 40px;
+      }
+
+      &:hover {
+        border-color: #1a1a1a;
+        background-color: #f1f2f6;
+      }
+
+      .upload-text {
+        color: #636e72;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+    }
+
+    .submit-btn {
+      margin-top: 24px !important;
+      background-color: #050509 !important;
+      color: #fff !important;
+      text-transform: none !important;
+      padding: 12px !important;
+      font-weight: 600 !important;
+      border-radius: 8px !important;
+      font-size: 0.95rem !important;
+
+      @media (min-width: 600px) {
+        margin-top: 32px !important;
+        padding: 14px !important;
+        font-size: 1rem !important;
+      }
+
+      &:hover {
+        background-color: #2d3436 !important;
+      }
+    }
+  }
+}

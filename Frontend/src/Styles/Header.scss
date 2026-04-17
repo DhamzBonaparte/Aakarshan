@@ -1,0 +1,94 @@
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; 
+}
+.header-container {
+   background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: none !important;
+    color: #1a1a1a !important;
+    position: sticky !important;
+    top: 0;
+    z-index: 1100; 
+    width: 100%;
+    left: 0;
+    right: 0;
+
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        max-width: 1200px;
+        width: 100%; // Changed from 95% to 100% to let Container/Padding handle it
+        margin: 0 auto;
+        padding: 0 24px;
+        box-sizing: border-box;
+    }
+
+    .logo {
+        font-weight: 700;
+        font-size: 1.78rem;
+        letter-spacing: -0.5px;
+        cursor: pointer;
+        color: #000;
+    }
+
+    .nav-links {
+        display: none; // Hidden on mobile
+        gap: 32px;
+
+        @media (min-width: 900px) {
+            display: flex;
+        }
+
+        a {
+            text-decoration: none;
+            color: #636e72; // The muted grayish-blue in your image
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+
+            &:hover {
+                color: #000;
+            }
+        }
+    }
+
+    .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .cart-icon {
+            color: #000;
+        }
+
+        .menu-button {
+            @media (min-width: 900px) {
+                display: none; // Hide hamburger on desktop
+            }
+        }
+    }
+}
+
+.mobile-drawer {
+    width: 100%; // Let PaperProps control the outer width
+    box-sizing: border-box;
+    padding: 20px;
+
+    .drawer-link {
+        display: block;
+        padding: 15px 0;
+        text-decoration: none;
+        color: #1a1a1a;
+        font-weight: 500;
+        border-bottom: 1px solid #eee;
+        transition: padding-left 0.2s ease;
+
+        &:hover {
+            padding-left: 8px;
+            color: #636e72;
+        }
+    }
+}
