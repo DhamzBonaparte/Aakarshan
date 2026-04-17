@@ -81,11 +81,66 @@ const getDesigns = async (req, res) => {
   try {
     const designs = await Catalog.find();
     res.status(200).json({ data: designs });
-
   } catch (err) {
     console.error("Error fetching designs:", err);
     res.status(500).json({ error: err.message });
   }
 };
 
-module.exports = { getAdminData, getAdminVerify, uploadDesign, getDesigns };
+const deleteDesign = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedDesign = await Catalog.findByIdAndDelete(id);
+    if (!deletedDesign) {
+      return res.status(404).json({ error: "Design not found" });
+    }
+    res
+      .status(200)
+      .json({ data: deletedDesign, message: "Design deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting design:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const updateDesign = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const         {
+          title,
+          price,
+          description,
+          imageUrl,
+          category,
+          availableSizes,
+          availableMaterials,
+          popular,
+        } = req.body;
+    const update = await Catalog.findByIdAndUpdate(id, {
+      title,
+      price,
+      description,
+      imageUrl,
+      category,
+      availableSizes,
+      availableMaterials, 
+      popular,
+    },{returnDocument: 'after'});
+     if (!update) {
+      return res.status(404).json({ error: "Design not found" });
+    }
+    res.json({ message: "Design updated successfully", data: update });
+  } catch (err) {
+    console.error("Error updating design:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = {
+  getAdminData,
+  getAdminVerify,
+  uploadDesign,
+  updateDesign,
+  getDesigns,
+  deleteDesign,
+};
