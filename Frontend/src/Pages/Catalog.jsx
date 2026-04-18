@@ -278,8 +278,9 @@ export function Catalog() {
     try {
       const data = await axios.post(
         "http://localhost:3000/api/v1/filterDesigns",
-        { categories: selectedCat, sizes: selectedSiz },
+        { categories: selectedCat, sizes: selectedSiz, sortBy },
       );
+      console.log(data?.data?.data);
       setAllDesigns(data?.data?.data);
     } catch (error) {
       console.error("Error fetching filtered designs:", error);
@@ -440,7 +441,10 @@ export function Catalog() {
                   <select
                     id="sort"
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
+                    onChange={(e) => 
+                      {setSortBy(e.target.value)
+                        handleFilter()
+                      }}
                     className="controls__sort-select"
                   >
                     <option value="newest">Newest</option>

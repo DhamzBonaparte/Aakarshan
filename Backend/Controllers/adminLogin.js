@@ -142,14 +142,33 @@ const updateDesign = async (req, res) => {
 
 const filterDesigns = async (req, res) => {
   try {
-    const { categories = [], sizes = [] } = req.body; // or req.query if using GET
+    const { categories = [], sizes = [], sortBy = "newest" } = req.body;
 
-    const designs = await Catalog.find({
-      $or: [
-        { category: { $in: categories } },
-        { availableSizes: { $in: sizes } },
-      ],
-    });
+    // Build query dynamically
+    const query = {};
+    if (categories.length > 0) query.category = { $in: categories };
+    if (sizes.length > 0) query.availableSizes = { $in: sizes };
+
+    // Decide sorting option
+    let sortOption = {};
+    switch (sortBy) {
+      case "price-low":
+        sortOption = { price: -1 }; // ascending
+        break;
+      case "price-high":
+        sortOption = { price: 1 }; // descending
+        break;
+      case "popular":
+        sortOption = { popular: 1 }; // true values first
+        break;
+      case "newest":
+      default:
+        sortOption = { createdAt: 1 }; // newest first
+        break;
+    }
+
+    // Apply filters + sorting
+    const designs = await Catalog.find(query).sort(sortOption);
 
     res.status(200).json({ success: true, data: designs });
   } catch (err) {

@@ -353,6 +353,7 @@ export function Admin() {
         },
       );
       await getDesigns();
+      handleCancel();
     } catch (err) {
       setErr(err.response?.data?.error);
       setTimeout(() => setErr(""), 3000);
