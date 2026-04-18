@@ -106,33 +106,55 @@ const deleteDesign = async (req, res) => {
 const updateDesign = async (req, res) => {
   try {
     const { id } = req.params;
-    const         {
-          title,
-          price,
-          description,
-          imageUrl,
-          category,
-          availableSizes,
-          availableMaterials,
-          popular,
-        } = req.body;
-    const update = await Catalog.findByIdAndUpdate(id, {
+    const {
       title,
       price,
       description,
       imageUrl,
       category,
       availableSizes,
-      availableMaterials, 
+      availableMaterials,
       popular,
-    },{returnDocument: 'after'});
-     if (!update) {
+    } = req.body;
+    const update = await Catalog.findByIdAndUpdate(
+      id,
+      {
+        title,
+        price,
+        description,
+        imageUrl,
+        category,
+        availableSizes,
+        availableMaterials,
+        popular,
+      },
+      { returnDocument: "after" },
+    );
+    if (!update) {
       return res.status(404).json({ error: "Design not found" });
     }
     res.json({ message: "Design updated successfully", data: update });
   } catch (err) {
     console.error("Error updating design:", err);
     res.status(500).json({ error: err.message });
+  }
+};
+
+const filterDesigns = async (req, res) => {
+  try {
+    const { categories = [], sizes = [] } = req.body; // or req.query if using GET
+
+    const designs = await Catalog.find({
+      $or: [
+        { category: { $in: categories } },
+        { availableSizes: { $in: sizes } },
+      ],
+    });
+
+    res.status(200).json({ success: true, data: designs });
+  } catch (err) {
+    console.error("Error fetching filtered designs:", err);
+    res.status(500).json({ success: false, error: "Server error" });
   }
 };
 
@@ -143,4 +165,5 @@ module.exports = {
   updateDesign,
   getDesigns,
   deleteDesign,
+  filterDesigns,
 };

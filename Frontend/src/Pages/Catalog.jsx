@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Navbar } from "../Components/Navbar";
 import { Footer } from "../Components/Footer";
 import React, { useEffect } from "react";
+import axios from "axios";
 
 const CATEGORIES = [
   "Spiritual",
@@ -122,7 +123,7 @@ const DesignCard = ({ design, onAddToCart }) => {
     >
       <div className={`design-card__image-container ${design.orientation}`}>
         <img
-          src={design.image}
+          src={design.imageUrl}
           alt={design.title}
           className="design-card__image"
         />
@@ -241,6 +242,60 @@ export function Catalog() {
   };
 
   const navigate = useNavigate();
+
+  const [allDesigns, setAllDesigns] = useState([]);
+
+  const getAllDesigns = async () => {
+    try {
+      const data = await axios.get(
+        "http://localhost:3000/api/v1/admin/getDesigns",
+      );
+      setAllDesigns(data?.data?.data);
+    } catch (error) {
+      console.error("Error fetching designs:", error);
+    }
+  };
+  // State
+  const [selectedCat, setSelectedCategory] = useState([]);
+  const [selectedSiz, setSelectedSize] = useState([]);
+
+  // Handlers
+  const toggleCat = (category) => {
+    setSelectedCategory((prev) =>
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category],
+    );
+  };
+
+  const toggleSiz = (size) => {
+    setSelectedSize((prev) =>
+      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size],
+    );
+  };
+
+  const handleFilter = async () => {
+    try {
+      const data = await axios.post(
+        "http://localhost:3000/api/v1/filterDesigns",
+        { categories: selectedCat, sizes: selectedSiz },
+      );
+      setAllDesigns(data?.data?.data);
+    } catch (error) {
+      console.error("Error fetching filtered designs:", error);
+    }
+  };
+
+  useEffect(() => {
+    getAllDesigns();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCategories.length > 0 || selectedSizes.length > 0) {
+      handleFilter();
+    }
+  }, [selectedCategories, selectedSizes]);
+
   return (
     <>
       <Navbar></Navbar>
@@ -313,6 +368,7 @@ export function Catalog() {
                 </div>
 
                 {/* Categories */}
+                {/* Categories */}
                 <div className="filters__section">
                   <h4 className="filters__section-title">Categories</h4>
                   <div className="filters__list">
@@ -321,7 +377,10 @@ export function Catalog() {
                         <input
                           type="checkbox"
                           checked={selectedCategories.includes(category)}
-                          onChange={() => toggleCategory(category)}
+                          onChange={() => {
+                            toggleCategory(category);
+                            toggleCat(category);
+                          }}
                           className="filters__checkbox"
                         />
                         <span className="filters__label">{category}</span>
@@ -329,17 +388,20 @@ export function Catalog() {
                     ))}
                   </div>
                 </div>
-
+ 
                 {/* Sizes */}
                 <div className="filters__section">
-                  <h4 className="filters__section-title">Size</h4>
+                  <h4 className="filters__section-title">Sizes</h4>
                   <div className="filters__list">
                     {SIZES.map((size) => (
                       <label key={size} className="filters__item">
                         <input
                           type="checkbox"
                           checked={selectedSizes.includes(size)}
-                          onChange={() => toggleSize(size)}
+                          onChange={() => {
+                            toggleSize(size);
+                            toggleSiz(size);
+                          }}
                           className="filters__checkbox"
                         />
                         <span className="filters__label">{size}</span>
@@ -362,9 +424,10 @@ export function Catalog() {
                     {showFilters ? <CloseIcon /> : <FilterAltIcon />}
                     {showFilters ? "Hide" : "Show"} Filters
                   </button>
+                  {/* here */}
                   <span className="controls__count">
-                    {filteredAndSortedDesigns.length}{" "}
-                    {filteredAndSortedDesigns.length === 1
+                    {allDesigns.length}{" "}
+                    {allDesigns.length === 1
                       ? "design"
                       : "designs"}
                   </span>
@@ -417,9 +480,9 @@ export function Catalog() {
               )}
 
               {/* Designs Grid */}
-              {filteredAndSortedDesigns.length > 0 ? (
+              {allDesigns.length > 0 ? (
                 <div className="designs-grid">
-                  {filteredAndSortedDesigns.map((design) => (
+                  {allDesigns.map((design) => (
                     <DesignCard
                       key={design._id}
                       design={design}
@@ -436,7 +499,7 @@ export function Catalog() {
                   <p className="no-results__text">
                     No designs match your filters
                   </p>
-                  <button onClick={clearAllFilters} className="no-results__btn">
+                  <button onClick={getAllDesigns} className="no-results__btn">
                     Clear Filters
                   </button>
                 </motion.div>
