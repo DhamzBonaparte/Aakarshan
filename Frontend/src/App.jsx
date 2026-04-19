@@ -7,8 +7,18 @@ import { CheckoutPage } from "./Pages/Checkout";
 import AdminLogin from "./Components/AdminLogin";
 import { Admin } from "./Pages/Admin";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import { useEffect, useState } from "react";
 
 function App() {
+  const [visitorId, setVisitorId] = useState(null);
+  useEffect(() => {
+    let id = localStorage.getItem("visitorId");
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem("visitorId", id);
+    }
+    setVisitorId(id);
+  }, []);
   return (
     <>
       <BrowserRouter>

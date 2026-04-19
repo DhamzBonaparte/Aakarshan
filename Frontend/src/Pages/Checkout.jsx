@@ -12,6 +12,8 @@ import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined
 import { Navbar } from "../Components/Navbar";
 import { Footer } from "../Components/Footer";
 import React from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const mockCartItems = [
   {
@@ -37,7 +39,7 @@ const mockCartItems = [
 ];
 
 export function CheckoutPage() {
-      useEffect(() => {
+  useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
   const navigate = useNavigate();
@@ -49,7 +51,7 @@ export function CheckoutPage() {
     streetAddress: "",
     city: "",
     postalCode: "",
-    paymentMethod: "eSewa",
+    paymentMethod: "cash",
   });
   const [orderPlaced, setOrderPlaced] = useState(false);
 
@@ -69,52 +71,129 @@ export function CheckoutPage() {
   };
 
   const removeFromCart = (cartId) => {
-    setCartItems((prev) => prev.filter((item) => item.cartId !== cartId));
+    setCartItems((prev) => {
+      const updatedCart = prev.filter((item) => item.cartId !== cartId);
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      return updatedCart;
+    });
   };
 
   const updateQuantity = (cartId, change) => {
-    setCartItems((prev) =>
-      prev
+    setCartItems((prev) => {
+      const updatedCart = prev
         .map((item) => {
           if (item.cartId === cartId) {
             const newQuantity = item.quantity + change;
-            return newQuantity > 0 ? { ...item, quantity: newQuantity } : item;
+            return { ...item, quantity: newQuantity };
           }
           return item;
         })
-        .filter((item) => item.quantity > 0),
-    );
+        .filter((item) => item.quantity > 0);
+
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      return updatedCart;
+    });
   };
 
   const clearCart = () => {
     setCartItems([]);
+    localStorage.removeItem("cart");
+    localStorage.removeItem("orders");
+    console.log("Cart and orders cleared");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    const id = localStorage.getItem("visitorId") || "";
+
     if (cartItems.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Cart is empty",
+        text: "Please add items before placing an order.",
+      });
       return;
     }
 
-    setOrderPlaced(true);
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to place this order?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, place order",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const customer = {
+          name: checkoutData.fullName,
+          email: checkoutData.email,
+          phone: checkoutData.phone,
+          street: checkoutData.streetAddress,
+          district: checkoutData.city,
+        };
 
-    // Simulate order placement
-    setTimeout(() => {
-      setCartItems([]);
-      setOrderPlaced(false);
-      setCheckoutData({
-        fullName: "",
-        email: "",
-        phone: "",
-        streetAddress: "",
-        city: "",
-        postalCode: "",
-        paymentMethod: "eSewa",
-      });
-      navigate("/");
-    }, 2000);
+        const payment = {
+          method: checkoutData.paymentMethod, // matches schema
+          status: "pending",
+        };
+
+        const productIds = cartItems.map((item) => item._id);
+
+        try {
+          setOrderPlaced(true);
+
+          // Send order to backend
+          await axios.post("http://localhost:3000/api/v1/setOrders", {
+            customer,
+            products: productIds,
+            payment: {
+              method: checkoutData.paymentMethod, // ✅ matches schema
+              status: "pending",
+            },
+            visitorId: id,
+          });
+
+          // Clear cart state
+          setCartItems([]);
+          localStorage.removeItem("cart");
+          localStorage.removeItem("orders");
+
+          setOrderPlaced(false);
+
+          // Reset checkout form
+          setCheckoutData({
+            fullName: "",
+            email: "",
+            phone: "",
+            streetAddress: "",
+            city: "",
+            postalCode: "",
+            paymentMethod: "cash",
+          });
+
+          Swal.fire(
+            "Order Placed!",
+            "Your order has been successfully placed.",
+            "success",
+          );
+
+          navigate("/");
+        } catch (err) {
+          setOrderPlaced(false);
+          Swal.fire({
+            icon: "error",
+            title: "Order Failed",
+            text:
+              err.response?.data?.message ||
+              "Something went wrong. Please try again.",
+          });
+          console.error("Error placing order:", err);
+        }
+      }
+    });
   };
-
   const formatNPR = (price) => {
     return new Intl.NumberFormat("ne-NP", {
       style: "currency",
@@ -124,9 +203,17 @@ export function CheckoutPage() {
     }).format(price);
   };
 
+  useEffect(() => {
+    const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    const savedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+
+    setCartItems(savedCart);
+    console.log(savedOrders);
+  }, []);
+
   return (
     <>
-    <Navbar></Navbar>
+      <Navbar></Navbar>
       <div className="checkout">
         <div className="checkout__container">
           {/* Header */}
@@ -156,7 +243,7 @@ export function CheckoutPage() {
                 cart
               </p>
               <button
-                onClick={() => navigate("/browse")}
+                onClick={() => navigate("/catalog")}
                 className="checkout__browse-btn"
               >
                 Browse Designs
@@ -182,7 +269,7 @@ export function CheckoutPage() {
                       className="cart-item"
                     >
                       <div className="cart-item__image">
-                        <img src={item.image} alt={item.title} />
+                        <img src={item.imageUrl} alt={item.title} />
                       </div>
 
                       <div className="cart-item__details">
@@ -297,6 +384,8 @@ export function CheckoutPage() {
                       placeholder="your@email.com"
                       className="checkout-form__input"
                       required
+                      pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                      title="Please enter a valid email address (e.g. your@email.com)"
                     />
                   </div>
 
@@ -313,6 +402,8 @@ export function CheckoutPage() {
                       placeholder="+977 98xxxxxxxx"
                       className="checkout-form__input"
                       required
+                      pattern="^(97|98)[0-9]{8}$"
+                      title="Phone number must start with 97 or 98 and be exactly 10 digits"
                     />
                   </div>
 
@@ -367,9 +458,9 @@ export function CheckoutPage() {
                       onChange={handleInputChange}
                       className="checkout-form__select"
                     >
-                      <option value="eSewa">eSewa</option>
-                      <option value="Khalti">Khalti</option>
-                      <option value="COD">Cash on Delivery</option>
+                      {/* <option value="esewa">eSewa</option>
+                      <option value="khalti">Khalti</option> */}
+                      <option value="cash">Cash on Delivery</option>
                     </select>
                   </div>
 

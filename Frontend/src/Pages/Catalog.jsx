@@ -183,15 +183,31 @@ export function Catalog() {
   };
 
   const handleAddToCart = (design) => {
-    setCart((prev) => [...prev, { ...design, quantity: 1 }]);
+    const visitorId = localStorage.getItem("visitorId");
+
+    setCart((prev) => {
+      const updatedCart = [
+        ...prev,
+        { ...design, quantity: 1, visitorId,cartId: Date.now().toString()  }, 
+      ];
+
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+      return updatedCart;
+    });
+
     setLastAddedItem(design.title);
     setShowCartNotification(true);
 
-    // Hide notification after 3 seconds
     setTimeout(() => {
       setShowCartNotification(false);
     }, 3000);
   };
+
+  useEffect(() => {
+    const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    setCart(savedCart);
+  }, []);
 
   const filteredAndSortedDesigns = useMemo(() => {
     let filtered = mockDesigns.filter((design) => {
@@ -286,6 +302,36 @@ export function Catalog() {
       console.error("Error fetching filtered designs:", error);
     }
   };
+  const [selectedItems, setSelectedItems] = useState([]);
+
+  const setOrders = async (order) => {
+    try {
+      const id = localStorage.getItem("visitorId");
+
+      // Get existing orders from localStorage
+      let savedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+
+      // Add the new order (object only, no extra array)
+      const newOrder = { ...order, visitorId: id };
+      savedOrders.push(newOrder);
+
+      // Save back to localStorage
+      localStorage.setItem("orders", JSON.stringify(savedOrders));
+
+      // Update React state so UI reflects changes immediately
+      setSelectedItems(savedOrders);
+
+      console.log("Visitor:", id, "Order:", newOrder);
+    } catch (err) {
+      console.error("Error saving order:", err);
+    }
+  };
+
+  // Hydrate state from localStorage when component mounts
+  useEffect(() => {
+    const savedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+    setSelectedItems(savedOrders);
+  }, []);
 
   useEffect(() => {
     getAllDesigns();
@@ -329,7 +375,10 @@ export function Catalog() {
               </div>
               <button
                 className="cart-summary__checkout"
-                onClick={() => navigate("/checkout")}
+                onClick={() => {
+                  navigate("/checkout");
+                  setOrders(cart);
+                }}
               >
                 Proceed to Checkout
               </button>
@@ -389,7 +438,7 @@ export function Catalog() {
                     ))}
                   </div>
                 </div>
- 
+
                 {/* Sizes */}
                 <div className="filters__section">
                   <h4 className="filters__section-title">Sizes</h4>
@@ -428,9 +477,7 @@ export function Catalog() {
                   {/* here */}
                   <span className="controls__count">
                     {allDesigns.length}{" "}
-                    {allDesigns.length === 1
-                      ? "design"
-                      : "designs"}
+                    {allDesigns.length === 1 ? "design" : "designs"}
                   </span>
                 </div>
 
@@ -441,10 +488,10 @@ export function Catalog() {
                   <select
                     id="sort"
                     value={sortBy}
-                    onChange={(e) => 
-                      {setSortBy(e.target.value)
-                        handleFilter()
-                      }}
+                    onChange={(e) => {
+                      setSortBy(e.target.value);
+                      handleFilter();
+                    }}
                     className="controls__sort-select"
                   >
                     <option value="newest">Newest</option>

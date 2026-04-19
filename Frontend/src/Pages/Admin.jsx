@@ -339,7 +339,16 @@ export function Admin() {
 
   const uploadDesign = async () => {
     try {
-      const data = await axios.post(
+      Swal.fire({
+        title: "Uploading...",
+        text: "Please wait while your design is being uploaded.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const { data } = await axios.post(
         "http://localhost:3000/api/v1/admin/uploadDesign",
         {
           title,
@@ -352,12 +361,23 @@ export function Admin() {
           popular,
         },
       );
+
       await getDesigns();
       handleCancel();
+
+      // Success alert
+      Swal.fire("Success!", "Design uploaded successfully.", "success");
     } catch (err) {
       setErr(err.response?.data?.error);
       setTimeout(() => setErr(""), 3000);
-      console.log(err);
+      console.error(err);
+
+      // Error alert
+      Swal.fire(
+        "Error!",
+        err.response?.data?.error || "Upload failed.",
+        "error",
+      );
     }
   };
 

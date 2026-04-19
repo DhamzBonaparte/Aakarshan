@@ -8,6 +8,7 @@ const getDesigns = require("../Controllers/adminLogin").getDesigns;
 const deleteDesign = require("../Controllers/adminLogin").deleteDesign;
 const updateDesign = require("../Controllers/adminLogin").updateDesign;
 const filterDesigns = require("../Controllers/adminLogin").filterDesigns;
+const { setOrders } = require("../Controllers/order");
 
 // router.route('/getCatalogs').get(getCatalog)
 router.route('/admin/login').post(getAdminData)
@@ -17,4 +18,5 @@ router.route('/admin/getDesigns').get(getDesigns)
 router.route('/admin/deleteDesign/:id').delete(deleteDesign)
 router.route('/admin/updateDesign/:id').put(updateDesign)
 router.route('/filterDesigns').post(filterDesigns)
+router.route('/setOrders').post(setOrders)
 module.exports = router;

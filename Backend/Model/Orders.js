@@ -1,57 +1,33 @@
 const mongoose = require("mongoose");
+const crypto = require("crypto"); // built-in, no install needed
 
 const orderSchema = new mongoose.Schema({
-  orderId: {
-    type: String,
-    unique: true,
-    required: [true, "Order ID is required"],
-    trim: true,
-  },
   customer: {
-    name: {
-      type: String,
-      required: [true, "Customer name is required"],
-      trim: true,
-      minlength: [2, "Name must be at least 2 characters"],
-    },
+    name: { type: String, required: true, trim: true, minlength: 2 },
     phone: {
       type: String,
-      required: [true, "Phone number is required"],
+      required: true,
       trim: true,
-      match: [/^\+?[0-9]{7,15}$/, "Please provide a valid phone number"],
+      match: [/^(97|98)[0-9]{8}$/, "Please provide a valid phone number"],
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: true,
       trim: true,
       lowercase: true,
       match: [/^\S+@\S+\.\S+$/, "Please provide a valid email address"],
     },
-    deliveryAddress: {
-      street: { type: String, required: true, trim: true },
-      city: { type: String, required: true, trim: true },
-      postalCode: {
-        type: String,
-        required: true,
-        trim: true,
-        minlength: [4, "Postal code must be at least 4 characters"],
-      },
-    },
+    street: { type: String, required: true, trim: true },
+    district: { type: String, required: true, trim: true },
   },
-  product: {
-    designId: {
+
+  products: [
+    {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Design",
+      ref: "Catalog",
       required: true,
     },
-    customSize: { type: String, trim: true },
-    customImageUrl: {
-      type: String,
-      trim: true,
-      match: [/^https?:\/\/.+\.(jpg|jpeg|png|webp|svg)$/, "Invalid image URL"],
-    },
-    material: { type: String, required: true, trim: true },
-  },
+  ],
   payment: {
     method: {
       type: String,
@@ -63,20 +39,29 @@ const orderSchema = new mongoose.Schema({
       default: "pending",
       enum: ["pending", "completed", "failed"],
     },
-    transactionId: { type: String, trim: true },
+    transactionId: {
+      type: String,
+      default: () => crypto.randomUUID(), // auto-generate UUID
+    },
   },
+
   fulfillment: {
     status: {
       type: String,
       default: "pending",
       enum: ["pending", "in-progress", "shipped", "delivered", "cancelled"],
     },
-    printerId: { type: mongoose.Schema.Types.ObjectId, ref: "Printer" },
-    trackingNumber: { type: String, trim: true },
+    trackingNumber: {
+      type: String,
+      trim: true,
+      default: () => crypto.randomUUID(), // auto-generate UUID
+    },
   },
+
+  visitorId: { type: String, trim: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date },
 });
 
-const orders = mongoose.model("Orders", orderSchema);
-module.exports = orders;
+const Orders = mongoose.model("Orders", orderSchema);
+module.exports = Orders;
