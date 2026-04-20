@@ -32,135 +32,8 @@ const CATEGORIES = [
 const SIZES = ["A4", "A3", "12x12", "18x24", "24x24", "24x36"];
 const MATERIALS = ["Canvas", "Vinyl", "Photo Paper"];
 
-// Mock designs data
-const mockDesignsData = [
-  {
-    _id: "1",
-    title: "Peaceful Waters",
-    description: "Tranquil blue abstract representing calm waters",
-    category: ["Abstract", "Nature"],
-    availableSizes: ["A3", "24x36"],
-    availableMaterials: ["Canvas"],
-    price: 4999,
-    popular: true,
-    createdAt: "2024-01-15",
-    imageUrl: "https://images.unsplash.com/photo-1541963463532-d68292c34b19",
-  },
-  {
-    _id: "2",
-    title: "Minimalist Geometry",
-    description: "Clean lines and shapes in neutral tones",
-    category: ["Minimalist", "Modern"],
-    availableSizes: ["A4", "A3", "18x24"],
-    availableMaterials: ["Canvas", "Photo Paper"],
-    price: 3999,
-    popular: false,
-    createdAt: "2024-02-01",
-    imageUrl: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5",
-  },
-  {
-    _id: "3",
-    title: "Verdant Garden",
-    description: "Fresh greens and yellows evoking spring meadows",
-    category: ["Nature", "Colorful"],
-    availableSizes: ["12x12", "A3", "24x24"],
-    availableMaterials: ["Canvas", "Vinyl"],
-    price: 4499,
-    popular: true,
-    createdAt: "2024-02-10",
-    imageUrl: "https://images.unsplash.com/photo-1501472312651-726afe119ff1",
-  },
-  {
-    _id: "4",
-    title: "Abstract Horizons",
-    description: "Warm abstract composition with flowing lines",
-    category: ["Abstract", "Modern"],
-    availableSizes: ["A4", "A3", "24x36"],
-    availableMaterials: ["Canvas"],
-    price: 4500,
-    popular: false,
-    createdAt: "2024-03-01",
-    imageUrl: "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8",
-  },
-  {
-    _id: "5",
-    title: "Ember Flow",
-    description: "Dynamic abstract with fiery warm tones",
-    category: ["Abstract", "Colorful"],
-    availableSizes: ["12x12", "18x24"],
-    availableMaterials: ["Canvas", "Vinyl"],
-    price: 5200,
-    popular: false,
-    createdAt: "2024-03-10",
-    imageUrl: "https://images.unsplash.com/photo-1541701494587-cb58502866ab",
-  },
-];
-
-// Mock orders data
-const mockOrdersData = [
-  {
-    _id: "1",
-    orderId: "ORD-001",
-    customerName: "Rajesh Kumar",
-    customerEmail: "rajesh@example.com",
-    customerPhone: "+977 9812345678",
-    deliveryAddress: {
-      street: "Thamel Street 123",
-      city: "Kathmandu",
-      postalCode: "44600",
-    },
-    items: [
-      { ...mockDesignsData[3], price: 4500 },
-      { ...mockDesignsData[4], price: 5200 },
-    ],
-    total: 9700,
-    paymentMethod: "eSewa",
-    status: "delivered",
-    createdAt: "2026-04-14T10:30:00",
-  },
-  {
-    _id: "2",
-    orderId: "ORD-002",
-    customerName: "Sita Sharma",
-    customerEmail: "sita@example.com",
-    customerPhone: "+977 9823456789",
-    deliveryAddress: {
-      street: "Durbar Marg 45",
-      city: "Kathmandu",
-      postalCode: "44600",
-    },
-    items: [{ ...mockDesignsData[0], price: 4999 }],
-    total: 4999,
-    paymentMethod: "Khalti",
-    status: "printing",
-    createdAt: "2026-04-13T14:20:00",
-  },
-  {
-    _id: "3",
-    orderId: "ORD-003",
-    customerName: "Amit Thapa",
-    customerEmail: "amit@example.com",
-    customerPhone: "+977 9834567890",
-    deliveryAddress: {
-      street: "Jhamsikhel Road",
-      city: "Lalitpur",
-      postalCode: "44700",
-    },
-    items: [
-      { ...mockDesignsData[1], price: 3999 },
-      { ...mockDesignsData[2], price: 4499 },
-    ],
-    total: 8498,
-    paymentMethod: "COD",
-    status: "shipped",
-    createdAt: "2026-04-12T09:15:00",
-  },
-];
-
 export function Admin() {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [designs, setDesigns] = useState(mockDesignsData);
-  const [orders, setOrders] = useState(mockOrdersData);
   const [showAddDesign, setShowAddDesign] = useState(false);
   const [editingDesign, setEditingDesign] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -175,22 +48,6 @@ export function Admin() {
     category: [],
     popular: false,
   });
-
-  useEffect(() => {
-    const savedDesigns = localStorage.getItem("adminDesigns");
-    const savedOrders = localStorage.getItem("adminOrders");
-    if (savedDesigns) setDesigns(JSON.parse(savedDesigns));
-    if (savedOrders) setOrders(JSON.parse(savedOrders));
-    getInfo();
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("adminDesigns", JSON.stringify(designs));
-  }, [designs]);
-
-  useEffect(() => {
-    localStorage.setItem("adminOrders", JSON.stringify(orders));
-  }, [orders]);
 
   const handleAddDesign = () => {
     if (!newDesign.title || !newDesign.imageUrl || newDesign.price <= 0) {
@@ -232,15 +89,42 @@ export function Admin() {
     }
   };
 
-  const handleUpdateOrderStatus = (orderId, status) => {
-    setOrders(orders.map((o) => (o._id === orderId ? { ...o, status } : o)));
-  };
+  const handleUpdateOrderStatus = async (orderId, status) => {
+    try {
+      // Show confirmation dialog
+      Swal.fire({
+        title: "Are you sure?",
+        text: `Do you want to change this order's status to "${status}"?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, update it",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          // Proceed with backend update
+          await axios.put(
+            `http://localhost:3000/api/v1/admin/updateStatus/${orderId}`,
+            { status },
+          );
 
-  const stats = {
-    totalOrders: orders.length,
-    pendingOrders: orders.filter((o) => o.status === "pending").length,
-    totalRevenue: orders.reduce((sum, o) => sum + o.total, 0),
-    totalDesigns: designs.length,
+          // Update local state
+          setOrdersData(
+            ordersData.map((o) => (o._id === orderId ? { ...o, status } : o)),
+          );
+
+          // Success alert
+          Swal.fire("Updated!", "Order status has been changed.", "success");
+        }
+      });
+    } catch (err) {
+      console.error("Error updating order status:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: err.response?.data?.msg || "Something went wrong.",
+      });
+    }
   };
 
   const toggleCategory = (cat, isEditing = false) => {
@@ -320,7 +204,6 @@ export function Admin() {
           },
         },
       );
-      console.log(data);
     } catch (err) {
       console.log(err);
     }
@@ -439,7 +322,6 @@ export function Admin() {
       );
       console.log(data);
       await getDesigns();
-
       // Reset form after successful update
       resetForm();
       setEditingDesign(null);
@@ -450,6 +332,20 @@ export function Admin() {
       console.error("Error updating design:", err);
       setErr(err.response?.data?.error);
       setTimeout(() => setErr(""), 3000);
+    }
+  };
+
+  const [ordersData, setOrdersData] = useState([]);
+
+  const getOrders = async () => {
+    try {
+      const data = await axios.get(
+        `http://localhost:3000/api/v1/admin/getOrders`,
+      );
+      console.log(data);
+      setOrdersData(data?.data?.data);
+    } catch (err) {
+      console.log(err.response?.data?.error);
     }
   };
 
@@ -475,6 +371,7 @@ export function Admin() {
 
   useEffect(() => {
     getDesigns();
+    getOrders();
   }, []);
 
   useEffect(() => {
@@ -489,6 +386,31 @@ export function Admin() {
       setAvailableMaterials(editingDesign.availableMaterials || []);
     }
   }, [editingDesign]);
+
+  const [stat, setStat] = useState({ totalRevenue: 0, pendingOrders: 0 });
+
+  useEffect(() => {
+    if (ordersData.length > 0) {
+      // Calculate total revenue, excluding cancelled orders
+      const totalRevenue = ordersData.reduce((sum, order) => {
+        // If cancelled, skip its items (subtract effect)
+        if (order.status === "cancelled") return sum;
+
+        const orderTotal = order.items.reduce((orderSum, item) => {
+          return orderSum + (item.price || 0);
+        }, 0);
+
+        return sum + orderTotal;
+      }, 0);
+
+      // Count pending orders
+      const pendingOrders = ordersData.filter(
+        (order) => order.status === "pending",
+      ).length;
+
+      setStat({ totalRevenue, pendingOrders });
+    }
+  }, [ordersData]);
 
   return (
     <>
@@ -519,14 +441,14 @@ export function Admin() {
                   className={`admin-nav__item ${activeTab === "designs" ? "admin-nav__item--active" : ""}`}
                 >
                   <InventoryIcon className="admin-nav__icon" />
-                  <span>Designs ({designs.length})</span>
+                  <span>Designs ({des.length})</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("orders")}
                   className={`admin-nav__item ${activeTab === "orders" ? "admin-nav__item--active" : ""}`}
                 >
                   <ShoppingCartIcon className="admin-nav__icon" />
-                  <span>Orders ({orders.length})</span>
+                  <span>Orders ({ordersData.length})</span>
                 </button>
               </nav>
             </div>
@@ -549,7 +471,7 @@ export function Admin() {
                         </div>
                         <TrendingUpIcon className="stat-card__trend" />
                       </div>
-                      <h3 className="stat-card__value">{stats.totalOrders}</h3>
+                      <h3 className="stat-card__value">{ordersData.length}</h3>
                       <p className="stat-card__label">Total Orders</p>
                     </motion.div>
 
@@ -564,9 +486,7 @@ export function Admin() {
                           <AccessTimeIcon />
                         </div>
                       </div>
-                      <h3 className="stat-card__value">
-                        {stats.pendingOrders}
-                      </h3>
+                      <h3 className="stat-card__value">{stat.pendingOrders}</h3>
                       <p className="stat-card__label">Pending Orders</p>
                     </motion.div>
 
@@ -582,7 +502,7 @@ export function Admin() {
                         </div>
                       </div>
                       <h3 className="stat-card__value">
-                        {formatNPR(stats.totalRevenue)}
+                        {formatNPR(stat.totalRevenue)}
                       </h3>
                       <p className="stat-card__label">Total Revenue</p>
                     </motion.div>
@@ -607,7 +527,7 @@ export function Admin() {
                   <div className="recent-orders">
                     <h2 className="recent-orders__title">Recent Orders</h2>
                     <div className="recent-orders__list">
-                      {orders.slice(0, 3).map((order) => (
+                      {ordersData.slice(0, 3).map((order) => (
                         <div key={order._id} className="recent-order">
                           <div className="recent-order__info">
                             <p className="recent-order__id">
@@ -884,7 +804,7 @@ export function Admin() {
                   <h2 className="orders-tab__title">Manage Orders</h2>
 
                   <div className="orders-list">
-                    {orders.map((order) => (
+                    {ordersData.map((order) => (
                       <div key={order._id} className="order-card">
                         <div className="order-card__header">
                           <div>
@@ -904,9 +824,12 @@ export function Admin() {
                           </div>
                           <select
                             value={order.status}
-                            onChange={(e) =>
-                              handleUpdateOrderStatus(order._id, e.target.value)
-                            }
+                            onChange={(e) => {
+                              handleUpdateOrderStatus(
+                                order._id,
+                                e.target.value,
+                              );
+                            }}
                             className={`status-select status-select--${order.status}`}
                           >
                             <option value="pending">Pending</option>

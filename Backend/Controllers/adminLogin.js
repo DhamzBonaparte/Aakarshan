@@ -1,6 +1,7 @@
 const express = require("express");
 const admins = require("../Model/Admin");
 const Catalog = require("../Model/Catalog");
+const Orders = require("../Model/Orders");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
@@ -177,6 +178,70 @@ const filterDesigns = async (req, res) => {
   }
 };
 
+const getOrders = async (req, res) => {
+  try {
+    // Fetch orders and populate product details
+    const orders = await Orders.find().populate("products");
+
+    // Transform each order into the mockData shape
+    const formattedOrders = orders.map((order, index) => {
+      return {
+        _id: order._id.toString(),
+        orderId: `ORD-${String(index + 1).padStart(3, "0")}`, // generate readable orderId
+        customerName: order.customer.name,
+        customerEmail: order.customer.email,
+        customerPhone: order.customer.phone,
+        deliveryAddress: {
+          street: order.customer.street,
+          city: order.customer.district,
+          postalCode: "N/A", // you can add postalCode if you store it
+        },
+        items: order.products.map((p) => ({
+          ...p.toObject(),
+          price: p.price, // assuming Catalog has a price field
+        })),
+        total: order.products.reduce((sum, p) => sum + (p.price || 0), 0),
+        paymentMethod: order.payment.method,
+        status: order.fulfillment.status,
+        createdAt: order.createdAt,
+      };
+    });
+
+    res.status(200).json({ data: formattedOrders });
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const updateStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const order = await Orders.findByIdAndUpdate(
+      id,
+      { "fulfillment.status": status, updatedAt: new Date() },
+      { returnDocument: "after" }, // ✅ updated option
+    );
+
+    if (!order) {
+      return res.status(404).json({ msg: "Order not found" });
+    }
+
+    res.status(200).json({ msg: "Order status updated", order });
+  } catch (err) {
+    res.status(500).json({
+      msg: "An error occurred!",
+      error: err.message,
+    });
+
+    console.error(err.message)
+  }
+};
+
+module.exports = { updateStatus };
+
 module.exports = {
   getAdminData,
   getAdminVerify,
@@ -185,4 +250,6 @@ module.exports = {
   getDesigns,
   deleteDesign,
   filterDesigns,
+  getOrders,
+  updateStatus,
 };
