@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
-const crypto = require("crypto"); // built-in, no install needed
+const crypto = require("crypto");
 
-const orderSchema = new mongoose.Schema({
+const customOrderSchema = new mongoose.Schema({
   customer: {
     name: { type: String, required: true, trim: true, minlength: 2 },
     phone: {
@@ -21,13 +21,20 @@ const orderSchema = new mongoose.Schema({
     district: { type: String, required: true, trim: true },
   },
 
-  products: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Catalog",
+  // Custom product details embedded directly
+  product: {
+    title: { type: String, default: "Custom Design" },
+    description: { type: String, default: "Personalized print" },
+    imageUrl: {
+      type: String,
       required: true,
+      match: [/^(https?:\/\/.+|\/uploads\/.+)$/, "Please provide a valid image URL"],
     },
-  ],
+    canvasSize: { type: String, required: true },
+    material: { type: String, required: true },
+    price: { type: Number, required: true },
+  },
+
   payment: {
     method: {
       type: String,
@@ -41,7 +48,7 @@ const orderSchema = new mongoose.Schema({
     },
     transactionId: {
       type: String,
-      default: () => crypto.randomUUID(), // auto-generate UUID
+      default: () => crypto.randomUUID(),
     },
   },
 
@@ -54,7 +61,7 @@ const orderSchema = new mongoose.Schema({
     trackingNumber: {
       type: String,
       trim: true,
-      default: () => crypto.randomUUID(), // auto-generate UUID
+      default: () => crypto.randomUUID(),
     },
   },
 
@@ -63,5 +70,5 @@ const orderSchema = new mongoose.Schema({
   updatedAt: { type: Date },
 });
 
-const Orders = mongoose.model("Orders", orderSchema);
-module.exports = Orders;
+const CustomOrders = mongoose.model("CustomOrders", customOrderSchema);
+module.exports = CustomOrders;

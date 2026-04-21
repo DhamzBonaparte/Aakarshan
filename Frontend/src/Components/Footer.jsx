@@ -1,8 +1,10 @@
 import React from "react";
 import { Box, Typography, Grid, Container } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import "../Styles/Footer.scss";
 
 export const Footer = () => {
+  const navigate=useNavigate()
   return (
     <Box component="footer" className="footer-section">
       <Container maxWidth="lg" className="footer-container">
@@ -36,10 +38,14 @@ export const Footer = () => {
                   </Typography>
                   <ul className="footer-links">
                     <li>
-                      <a href="/ready-made">Browse Designs</a>
+                      <a 
+                      style={{
+                        cursor:'pointer'
+                      }}
+                      onClick={()=>{navigate('/catalog')}}>Browse Designs</a>
                     </li>
                     <li>
-                      <a href="/custom-order">Custom Order</a>
+                      <a onClick={()=>{navigate('/custom')}}>Custom Order</a>
                     </li>
                   </ul>
                 </Box>
@@ -53,13 +59,13 @@ export const Footer = () => {
                   </Typography>
                   <ul className="footer-links">
                     <li>
-                      <a href="/contact">Contact</a>
+                      <a onClick={()=>{navigate('/contact')}}>Contact</a>
                     </li>
                     <li>
-                      <a href="/shipping">Shipping</a>
+                      <a onClick={()=>{navigate('/contact')}}>Shipping</a>
                     </li>
                     <li>
-                      <a href="/returns">Returns</a>
+                      <a onClick={()=>{navigate('/contact')}}>Returns</a>
                     </li>
                   </ul>
                 </Box>

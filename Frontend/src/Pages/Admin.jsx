@@ -15,6 +15,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import PrintIcon from "@mui/icons-material/Print";
 import CancelIcon from "@mui/icons-material/Cancel";
 import PendingIcon from "@mui/icons-material/Pending";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import Swal from "sweetalert2";
 import axios from "axios";
 import "../Styles/Admin.scss";
@@ -37,6 +38,7 @@ export function Admin() {
   const [showAddDesign, setShowAddDesign] = useState(false);
   const [editingDesign, setEditingDesign] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [customData, setCustomData] = useState([]);
 
   const [newDesign, setNewDesign] = useState({
     title: "",
@@ -111,6 +113,44 @@ export function Admin() {
           // Update local state
           setOrdersData(
             ordersData.map((o) => (o._id === orderId ? { ...o, status } : o)),
+          );
+
+          // Success alert
+          Swal.fire("Updated!", "Order status has been changed.", "success");
+        }
+      });
+    } catch (err) {
+      console.error("Error updating order status:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: err.response?.data?.msg || "Something went wrong.",
+      });
+    }
+  };
+
+  const handleUpdateCustomOrderStatus = async (orderId, status) => {
+    try {
+      // Show confirmation dialog
+      Swal.fire({
+        title: "Are you sure?",
+        text: `Do you want to change this order's status to "${status}"?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, update it",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          // Proceed with backend update
+          await axios.put(
+            `http://localhost:3000/api/v1/updateCustomStatus/${orderId}`,
+            { status },
+          );
+
+          // Update local state
+          setCustomData(
+            customData.map((o) => (o._id === orderId ? { ...o, status } : o)),
           );
 
           // Success alert
@@ -209,6 +249,18 @@ export function Admin() {
     }
   };
 
+  const getCustomOrders = async () => {
+    try {
+      const { data } = await axios.get(
+        "http://localhost:3000/api/v1/getCustomOrders",
+      );
+      setCustomData(data?.data);
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
@@ -270,6 +322,7 @@ export function Admin() {
         "http://localhost:3000/api/v1/admin/getDesigns",
       );
       setDes(data?.data?.data);
+      console.log(data);
     } catch (err) {
       console.error("Error fetching designs:", err);
       setErr(err.response?.data?.error);
@@ -372,6 +425,7 @@ export function Admin() {
   useEffect(() => {
     getDesigns();
     getOrders();
+    getCustomOrders();
   }, []);
 
   useEffect(() => {
@@ -390,27 +444,35 @@ export function Admin() {
   const [stat, setStat] = useState({ totalRevenue: 0, pendingOrders: 0 });
 
   useEffect(() => {
-    if (ordersData.length > 0) {
-      // Calculate total revenue, excluding cancelled orders
-      const totalRevenue = ordersData.reduce((sum, order) => {
-        // If cancelled, skip its items (subtract effect)
+    // Merge normal and custom orders into one array
+    const allOrders = [
+      ...ordersData,
+      ...customData.map((order) => ({
+        ...order,
+        // normalize: ensure items is always an array
+        items: order.items || [order.item],
+      })),
+    ];
+
+    if (allOrders.length > 0) {
+      const totalRevenue = allOrders.reduce((sum, order) => {
         if (order.status === "cancelled") return sum;
 
-        const orderTotal = order.items.reduce((orderSum, item) => {
-          return orderSum + (item.price || 0);
-        }, 0);
+        const orderTotal = order.items.reduce(
+          (orderSum, item) => orderSum + (item.price || 0),
+          0,
+        );
 
         return sum + orderTotal;
       }, 0);
 
-      // Count pending orders
-      const pendingOrders = ordersData.filter(
+      const pendingOrders = allOrders.filter(
         (order) => order.status === "pending",
       ).length;
 
       setStat({ totalRevenue, pendingOrders });
     }
-  }, [ordersData]);
+  }, [ordersData, customData]);
 
   return (
     <>
@@ -450,6 +512,13 @@ export function Admin() {
                   <ShoppingCartIcon className="admin-nav__icon" />
                   <span>Orders ({ordersData.length})</span>
                 </button>
+                <button
+                  onClick={() => setActiveTab("custom")}
+                  className={`admin-nav__item ${activeTab === "custom" ? "admin-nav__item--active" : ""}`}
+                >
+                  <AutoFixHighIcon className="admin-nav__icon" />
+                  <span>Custom Orders ({customData.length})</span>
+                </button>
               </nav>
             </div>
 
@@ -471,7 +540,9 @@ export function Admin() {
                         </div>
                         <TrendingUpIcon className="stat-card__trend" />
                       </div>
-                      <h3 className="stat-card__value">{ordersData.length}</h3>
+                      <h3 className="stat-card__value">
+                        {ordersData.length + customData.length}
+                      </h3>
                       <p className="stat-card__label">Total Orders</p>
                     </motion.div>
 
@@ -524,7 +595,12 @@ export function Admin() {
                   </div>
 
                   {/* Recent Orders */}
-                  <div className="recent-orders">
+                  <div
+                    className="recent-orders"
+                    style={{
+                      marginBottom: "2rem",
+                    }}
+                  >
                     <h2 className="recent-orders__title">Recent Orders</h2>
                     <div className="recent-orders__list">
                       {ordersData.slice(0, 3).map((order) => (
@@ -535,6 +611,35 @@ export function Admin() {
                             </p>
                             <p className="recent-order__details">
                               {order.items.length} items ·{" "}
+                              {formatNPR(order.total)}
+                            </p>
+                          </div>
+                          <div className="recent-order__status">
+                            <span
+                              className={`status-badge status-badge--${order.status}`}
+                            >
+                              {getStatusIcon(order.status)}
+                              {order.status}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="recent-orders">
+                    <h2 className="recent-orders__title">
+                      Recent Custom Orders
+                    </h2>
+                    <div className="recent-orders__list">
+                      {customData.slice(0, 3).map((order) => (
+                        <div key={order._id} className="recent-order">
+                          <div className="recent-order__info">
+                            <p className="recent-order__id">
+                              {order.orderId} - {order.customerName}
+                            </p>
+                            <p className="recent-order__details">
+                              {order.item.length} items ·{" "}
                               {formatNPR(order.total)}
                             </p>
                           </div>
@@ -802,7 +907,6 @@ export function Admin() {
               {activeTab === "orders" && (
                 <div className="orders-tab">
                   <h2 className="orders-tab__title">Manage Orders</h2>
-
                   <div className="orders-list">
                     {ordersData.map((order) => (
                       <div key={order._id} className="order-card">
@@ -888,6 +992,117 @@ export function Admin() {
                           </div>
                         </div>
 
+                        <div className="order-card__footer">
+                          <div className="order-card__payment">
+                            <span>Payment Method:</span> {order.paymentMethod}
+                          </div>
+                          <div className="order-card__total">
+                            <span>Total:</span>
+                            <strong>{formatNPR(order.total)}</strong>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {activeTab === "custom" && (
+                <div className="orders-tab">
+                  <h2 className="orders-tab__title">Manage Custom Orders</h2>
+                  <div className="orders-list">
+                    {customData.map((order) => (
+                      <div key={order._id} className="order-card">
+                        {/* Header */}
+                        <div className="order-card__header">
+                          <div>
+                            <h3 className="order-card__id">{order.orderId}</h3>
+                            <p className="order-card__date">
+                              {new Date(order.createdAt).toLocaleDateString(
+                                "en-US",
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                },
+                              )}
+                            </p>
+                          </div>
+                          <select
+                            value={order.status}
+                            onChange={(e) =>
+                              handleUpdateCustomOrderStatus(
+                                order._id,
+                                e.target.value,
+                              )
+                            }
+                            className={`status-select status-select--${order.status}`}
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="printing">Printing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
+                        </div>
+
+                        {/* Customer + Address */}
+                        <div className="order-card__details">
+                          <div className="order-card__customer">
+                            <h4>Customer Details</h4>
+                            <p>
+                              <span>Name:</span> {order.customerName}
+                            </p>
+                            <p>
+                              <span>Email:</span> {order.customerEmail}
+                            </p>
+                            <p>
+                              <span>Phone:</span> {order.customerPhone}
+                            </p>
+                          </div>
+
+                          <div className="order-card__address">
+                            <h4>Delivery Address</h4>
+                            <p>{order.deliveryAddress.street}</p>
+                            <p>
+                              {order.deliveryAddress.city},{" "}
+                              {order.deliveryAddress.postalCode}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Items */}
+                        <div className="order-card__items">
+                          <h4>
+                            Order Items ({order.items ? order.items.length : 1})
+                          </h4>
+                          <div className="order-items">
+                            {(order.items || [order.item]).map((item, idx) => (
+                              <div key={idx} className="order-item">
+                                <div className="order-item__image">
+                                  <img
+                                    src={`http://localhost:3000${item.imageUrl}`}
+                                    alt={item.title}
+                                  />
+                                </div>
+                                <div className="order-item__info">
+                                  <p className="order-item__title">
+                                    {item.title}
+                                  </p>
+                                  <p className="order-item__category">
+                                    {item.category?.slice(0, 2).join(", ")}
+                                  </p>
+                                </div>
+                                <div className="order-item__price">
+                                  {formatNPR(item.price)}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Footer */}
                         <div className="order-card__footer">
                           <div className="order-card__payment">
                             <span>Payment Method:</span> {order.paymentMethod}

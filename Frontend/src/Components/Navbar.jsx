@@ -56,8 +56,8 @@ export const Navbar = ({ cartCount = 0 }) => {
           </Box>
 
           {/* Actions */}
-          <Box className="actions" onClick={() => navigate("/checkout")}>
-            <IconButton className="cart-icon">
+          <Box className="actions" >
+            <IconButton className="cart-icon" onClick={() => navigate("/checkout")}>
               <Badge badgeContent={cartCount} color="primary">
                 <ShoppingBagOutlined  />
               </Badge>
