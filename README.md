@@ -1,4 +1,1 @@
-"# Aakarshan-2" 
-"# Aakarshan-2" 
-"# Aakarshan-2" 
-"# Actual-Aakarshan" 
+Aakarshan is a full‑stack web application built to sell custom canvas art and paintings online. It combines a modern storefront with a powerful admin panel, giving both customers and administrators a seamless experience.
