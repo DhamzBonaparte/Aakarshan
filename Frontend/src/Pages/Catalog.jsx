@@ -264,7 +264,7 @@ export function Catalog() {
   const getAllDesigns = async () => {
     try {
       const data = await axios.get(
-        `${backendUrl}/api/v1/admin/getDesigns`,
+        `${import.meta.env.VITE_BACKEND_URI}/api/v1/admin/getDesigns`,
       );
       setAllDesigns(data?.data?.data);
     } catch (error) {
@@ -289,11 +289,10 @@ export function Catalog() {
       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size],
     );
   };
-  const backendUrl = import.meta.env.VITE_BACKEND_URI;
   const handleFilter = async () => {
     try {
       const data = await axios.post(
-        `${backendUrl}/api/v1/filterDesigns`,
+        `${import.meta.env.VITE_BACKEND_URI}/api/v1/filterDesigns`,
         { categories: selectedCat, sizes: selectedSiz, sortBy },
       );
       console.log(data?.data?.data);
