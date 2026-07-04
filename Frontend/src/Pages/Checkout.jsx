@@ -145,15 +145,18 @@ export function CheckoutPage() {
           setOrderPlaced(true);
 
           // Send order to backend
-          await axios.post(`${import.meta.env.VITE_BACKEND_URI}/api/v1/setOrders`, {
-            customer,
-            products: productIds,
-            payment: {
-              method: checkoutData.paymentMethod, // ✅ matches schema
-              status: "pending",
+          await axios.post(
+            `${import.meta.env.VITE_BACKEND_URI}/api/v1/setOrders`,
+            {
+              customer,
+              products: productIds,
+              payment: {
+                method: checkoutData.paymentMethod, // ✅ matches schema
+                status: "pending",
+              },
+              visitorId: id,
             },
-            visitorId: id,
-          });
+          );
 
           // Clear cart state
           setCartItems([]);

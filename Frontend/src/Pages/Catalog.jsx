@@ -188,7 +188,7 @@ export function Catalog() {
     setCart((prev) => {
       const updatedCart = [
         ...prev,
-        { ...design, quantity: 1, visitorId,cartId: Date.now().toString()  }, 
+        { ...design, quantity: 1, visitorId, cartId: Date.now().toString() },
       ];
 
       localStorage.setItem("cart", JSON.stringify(updatedCart));
