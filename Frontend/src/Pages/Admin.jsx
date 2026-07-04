@@ -106,7 +106,7 @@ export function Admin() {
         if (result.isConfirmed) {
           // Proceed with backend update
           await axios.put(
-            `http://localhost:3000/api/v1/admin/updateStatus/${orderId}`,
+            `${import.meta.env.VITE_BACKEND_URI}/api/v1/admin/updateStatus/${orderId}`,
             { status },
           );
 
@@ -144,7 +144,7 @@ export function Admin() {
         if (result.isConfirmed) {
           // Proceed with backend update
           await axios.put(
-            `http://localhost:3000/api/v1/updateCustomStatus/${orderId}`,
+            `${import.meta.env.VITE_BACKEND_URI}/api/v1/updateCustomStatus/${orderId}`,
             { status },
           );
 
@@ -237,7 +237,7 @@ export function Admin() {
     try {
       const token = localStorage.getItem("token");
       const data = await axios.get(
-        "http://localhost:3000/api/v1/admin/verify",
+        `${import.meta.env.VITE_BACKEND_URI}/api/v1/admin/verify`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -252,7 +252,7 @@ export function Admin() {
   const getCustomOrders = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:3000/api/v1/getCustomOrders",
+        `${import.meta.env.VITE_BACKEND_URI}/api/v1/getCustomOrders`,
       );
       setCustomData(data?.data);
       console.log(data);
@@ -284,7 +284,7 @@ export function Admin() {
       });
 
       const { data } = await axios.post(
-        "http://localhost:3000/api/v1/admin/uploadDesign",
+        `${import.meta.env.VITE_BACKEND_URI}/api/v1/admin/uploadDesign`,
         {
           title,
           price,
@@ -319,7 +319,7 @@ export function Admin() {
   const getDesigns = async () => {
     try {
       const data = await axios.get(
-        "http://localhost:3000/api/v1/admin/getDesigns",
+        `${import.meta.env.VITE_BACKEND_URI}/api/v1/admin/getDesigns`,
       );
       setDes(data?.data?.data);
       console.log(data);
@@ -345,7 +345,7 @@ export function Admin() {
 
       if (result.isConfirmed) {
         await axios.delete(
-          `http://localhost:3000/api/v1/admin/deleteDesign/${id}`,
+          `${import.meta.env.VITE_BACKEND_URI}/api/v1/admin/deleteDesign/${id}`,
         );
         await getDesigns();
 
@@ -361,7 +361,7 @@ export function Admin() {
   const updateDesign = async (id) => {
     try {
       const data = await axios.put(
-        `http://localhost:3000/api/v1/admin/updateDesign/${id}`,
+        `${import.meta.env.VITE_BACKEND_URI}/api/v1/admin/updateDesign/${id}`,
         {
           title,
           price,
@@ -393,7 +393,7 @@ export function Admin() {
   const getOrders = async () => {
     try {
       const data = await axios.get(
-        `http://localhost:3000/api/v1/admin/getOrders`,
+        `${import.meta.env.VITE_BACKEND_URI}/api/v1/admin/getOrders`,
       );
       console.log(data);
       setOrdersData(data?.data?.data);
@@ -1082,7 +1082,7 @@ export function Admin() {
                               <div key={idx} className="order-item">
                                 <div className="order-item__image">
                                   <img
-                                    src={`http://localhost:3000${item.imageUrl}`}
+                                    src={`${import.meta.env.VITE_BACKEND_URI}${item.imageUrl}`}
                                     alt={item.title}
                                   />
                                 </div>

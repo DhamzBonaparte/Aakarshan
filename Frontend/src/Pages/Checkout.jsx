@@ -145,7 +145,7 @@ export function CheckoutPage() {
           setOrderPlaced(true);
 
           // Send order to backend
-          await axios.post("http://localhost:3000/api/v1/setOrders", {
+          await axios.post(`${import.meta.env.VITE_BACKEND_URI}/api/v1/setOrders`, {
             customer,
             products: productIds,
             payment: {

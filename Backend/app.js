@@ -4,11 +4,25 @@ const connect = require("./Database/db");
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
-const path=require('path')
+const path = require("path");
+
+const allowedOrigins = [
+  "http://localhost:5173", // local dev
+  "https://aakarshann.netlify.app", // deployed frontend
+];
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // frontend URL
+    origin: function (origin, callback) {
+      // allow requests with no origin (like curl, mobile apps)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   }),

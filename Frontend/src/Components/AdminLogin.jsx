@@ -13,10 +13,13 @@ const AdminLogin = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:3000/api/v1/admin/login", {
-        username,
-        password,
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URI}/api/v1/admin/login`,
+        {
+          username,
+          password,
+        },
+      );
       const token = res.data.token;
       localStorage.setItem("token", token); // store JWT
       navigate("/admin");

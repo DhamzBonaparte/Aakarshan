@@ -88,7 +88,7 @@ export const OrderForm = () => {
       formData.append("visitorId", id);
 
       const { data } = await axios.post(
-        "http://localhost:3000/api/v1/custom-order",
+        `${import.meta.env.VITE_BACKEND_URI}/api/v1/custom-order`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } },
       );
