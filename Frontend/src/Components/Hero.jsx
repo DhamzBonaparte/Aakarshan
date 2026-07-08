@@ -4,7 +4,6 @@ import { ShoppingBagOutlined, PaletteOutlined } from "@mui/icons-material";
 import "../Styles/Hero.scss";
 import { useNavigate } from "react-router-dom";
 
-
 export const Hero = () => {
   const navigate = useNavigate();
 
@@ -34,7 +33,7 @@ export const Hero = () => {
             variant="contained"
             className="hero-button btn-primary"
             startIcon={<ShoppingBagOutlined />}
-            href="#designs" 
+            href="#designs"
             onClick={() => navigate("/catalog")}
           >
             Browse Designs
